@@ -52,7 +52,13 @@ class Filter:
             raise FilterError(
                 f"invalid filter {expr!r}; expected FIELD OP VALUE, e.g. tags=raft or year>=2022"
             )
-        return cls(m.group(1), m.group(2), m.group(3))
+        field, op, value = m.groups()
+        if op in _NUMERIC:
+            try:
+                float(value)
+            except ValueError:
+                raise FilterError(f"filter {expr!r}: {op} needs a number, got {value!r}") from None
+        return cls(field, op, value)
 
     def _lookup(self, chunk: Chunk) -> Any:
         if self.field in _BUILTIN_FIELDS:

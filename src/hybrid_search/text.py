@@ -12,7 +12,9 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import lru_cache
 
-_WORD_RE = re.compile(r"[0-9a-z]+(?:['’][a-z]+)?", re.IGNORECASE)
+# Unicode letters/digits (not underscore), allowing one inner apostrophe: "leader's".
+_APOSTROPHES = "'’"
+_WORD_RE = re.compile(rf"[^\W_]+(?:[{_APOSTROPHES}][^\W_]+)?")
 
 STOPWORDS: frozenset[str] = frozenset(
     """

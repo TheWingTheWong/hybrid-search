@@ -61,7 +61,11 @@ def make_snippet(
             pieces.append((text[cursor : m.start()], False))
             pieces.append((m.group(), True))
             cursor = m.end()
-    pieces.append((text[cursor : words[end - 1].end()], False))
+    # Keep punctuation glued to the last word ("bits." rather than "bits").
+    stop = words[end - 1].end()
+    while stop < len(text) and not text[stop].isspace():
+        stop += 1
+    pieces.append((text[cursor:stop], False))
 
     out, spans = [], []
     length = 0
