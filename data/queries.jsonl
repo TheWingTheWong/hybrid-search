@@ -1,0 +1,48 @@
+{"id": "q01", "query": "how does raft elect a leader", "type": "question", "relevant": {"raft-consensus": 2, "glossary:leader-election": 2, "paxos": 1}}
+{"id": "q02", "query": "bloom filter false positive rate", "type": "keyword", "relevant": {"bloom-filters": 2}}
+{"id": "q03", "query": "bloom filtr false positve", "type": "typo", "relevant": {"bloom-filters": 2}}
+{"id": "q04", "query": "vector clock happened-before relation", "type": "keyword", "relevant": {"vector-clocks": 2, "clocks-and-time": 1}}
+{"id": "q05", "query": "lamport timestamps", "type": "keyword", "relevant": {"clocks-and-time": 2, "vector-clocks": 1}}
+{"id": "q06", "query": "what happens to participants when the 2pc coordinator crashes", "type": "question", "relevant": {"two-phase-commit": 2}}
+{"id": "q07", "query": "merging concurrent edits from offline replicas without coordination", "type": "paraphrase", "relevant": {"crdts": 2, "glossary:eventual-consistency": 1, "vector-clocks": 1}}
+{"id": "q08", "query": "conflict-free replicated data types", "type": "keyword", "relevant": {"crdts": 2}}
+{"id": "q09", "query": "adding a server should only move a small fraction of keys", "type": "paraphrase", "relevant": {"consistent-hashing": 2, "glossary:sharding": 1}}
+{"id": "q10", "query": "virtual nodes on the hash ring", "type": "keyword", "relevant": {"consistent-hashing": 2}}
+{"id": "q11", "query": "epidemic dissemination of cluster membership", "type": "paraphrase", "relevant": {"gossip-protocols": 2, "glossary:anti-entropy": 1}}
+{"id": "q12", "query": "SWIM failure detector", "type": "keyword", "relevant": {"gossip-protocols": 2}}
+{"id": "q13", "query": "memtable flush and sstable compaction", "type": "keyword", "relevant": {"lsm-trees": 2, "glossary:compaction": 1}}
+{"id": "q14", "query": "write amplification leveled vs size-tiered", "type": "keyword", "relevant": {"lsm-trees": 2, "glossary:write-amplification": 2, "b-trees": 1}}
+{"id": "q15", "query": "b+ tree node split on insert", "type": "keyword", "relevant": {"b-trees": 2}}
+{"id": "q16", "query": "why do databases append to a log before changing data pages", "type": "question", "relevant": {"write-ahead-logging": 2}}
+{"id": "q17", "query": "ARIES recovery redo and undo passes", "type": "keyword", "relevant": {"write-ahead-logging": 2}}
+{"id": "q18", "query": "readers never block writers by keeping multiple row versions", "type": "paraphrase", "relevant": {"mvcc": 2, "glossary:snapshot-isolation": 1}}
+{"id": "q19", "query": "snapshot isolation write skew anomaly", "type": "keyword", "relevant": {"mvcc": 2, "glossary:snapshot-isolation": 2}}
+{"id": "q20", "query": "choose consistency or availability during a network partition", "type": "paraphrase", "relevant": {"cap-theorem": 2, "glossary:linearizability": 1}}
+{"id": "q21", "query": "PACELC latency tradeoff", "type": "keyword", "relevant": {"cap-theorem": 2}}
+{"id": "q22", "query": "clock skew and NTP synchronization", "type": "keyword", "relevant": {"clocks-and-time": 2}}
+{"id": "q23", "query": "fencing tokens for expired leases", "type": "keyword", "relevant": {"glossary:fencing-token": 2, "clocks-and-time": 2}}
+{"id": "q24", "query": "tcp slow start congestion window", "type": "keyword", "relevant": {"tcp-congestion-control": 2}}
+{"id": "q25", "query": "BBR versus CUBIC", "type": "keyword", "relevant": {"tcp-congestion-control": 2}}
+{"id": "q26", "query": "why does my service freeze during garbage collection", "type": "question", "relevant": {"garbage-collection": 2}}
+{"id": "q27", "query": "open addressing collision resolution", "type": "keyword", "relevant": {"hash-tables": 2}}
+{"id": "q28", "query": "robin hood hashing probe length", "type": "keyword", "relevant": {"hash-tables": 2}}
+{"id": "q29", "query": "probabilistic ordered structure with express lanes of levels", "type": "paraphrase", "relevant": {"skip-lists": 2}}
+{"id": "q30", "query": "postings lists and term frequency scoring", "type": "keyword", "relevant": {"inverted-indexes": 2}}
+{"id": "q31", "query": "approximate nearest neighbor graph index and recall", "type": "keyword", "relevant": {"vector-search": 2}}
+{"id": "q32", "query": "how do I cap how many calls a client can make each second", "type": "question", "relevant": {"rate-limiting": 2}}
+{"id": "q33", "query": "token bucket burst capacity", "type": "keyword", "relevant": {"rate-limiting": 2}}
+{"id": "q34", "query": "least connections versus round robin", "type": "keyword", "relevant": {"load-balancing": 2}}
+{"id": "q35", "query": "exponential backoff with jitter", "type": "keyword", "relevant": {"retries-and-circuit-breakers": 2}}
+{"id": "q36", "query": "stop calling a dependency that keeps failing", "type": "paraphrase", "relevant": {"retries-and-circuit-breakers": 2}}
+{"id": "q37", "query": "is it safe to send the same request twice", "type": "question", "relevant": {"glossary:idempotency": 2, "retries-and-circuit-breakers": 2, "glossary:at-least-once-delivery": 1}}
+{"id": "q38", "query": "detect divergent replicas by comparing hash trees", "type": "paraphrase", "relevant": {"merkle-trees": 2, "glossary:anti-entropy": 1, "gossip-protocols": 1}}
+{"id": "q39", "query": "error budget burn and paging the on-call engineer", "type": "keyword", "relevant": {"operations-handbook": 2}}
+{"id": "q40", "query": "blameless incident review", "type": "keyword", "relevant": {"operations-handbook": 2}}
+{"id": "q41", "query": "why must read and write quorums overlap", "type": "question", "relevant": {"glossary:quorum": 2, "cap-theorem": 1, "paxos": 1}}
+{"id": "q42", "query": "deleted keys are marked instead of removed", "type": "paraphrase", "relevant": {"glossary:tombstone": 2, "lsm-trees": 1, "crdts": 1}}
+{"id": "q43", "query": "conssistent hashng", "type": "typo", "relevant": {"consistent-hashing": 2}}
+{"id": "q44", "query": "merkel tre inclusion proof", "type": "typo", "relevant": {"merkle-trees": 2}}
+{"id": "q45", "query": "paxos prepare promise accept", "type": "keyword", "relevant": {"paxos": 2}}
+{"id": "q46", "query": "a follower replica falls behind the leader", "type": "paraphrase", "relevant": {"glossary:replication-lag": 2, "raft-consensus": 1}}
+{"id": "q47", "query": "garbge colection generations", "type": "typo", "relevant": {"garbage-collection": 2}}
+{"id": "q48", "query": "idempotncy keys for retries", "type": "typo", "relevant": {"glossary:idempotency": 2, "retries-and-circuit-breakers": 2}}

@@ -116,11 +116,13 @@ class SearchEngine:
         self.vectors = vectors
         self.config = config
         self.stats = stats or {}
-        cls = BM25F if config.scorer == "bm25f" else BM25
-        kwargs: dict[str, Any] = {"k1": config.k1, "b": config.b}
-        if cls is BM25F:
-            kwargs["weights"] = config.field_weights
-        self.scorer = cls(lexical, **kwargs)
+        self.scorers: dict[str, BM25] = {
+            "bm25": BM25(lexical, k1=config.k1, b=config.b),
+            "bm25f": BM25F(lexical, k1=config.k1, b=config.b, weights=config.field_weights),
+        }
+        if config.scorer not in self.scorers:
+            raise ValueError(f"unknown scorer {config.scorer!r}")
+        self.scorer = self.scorers[config.scorer]
         # Brute-force view over the same vectors: ground truth + filtered fallback.
         self.exact = vectors if isinstance(vectors, ExactIndex) else _exact_view(vectors)
 
@@ -191,9 +193,9 @@ class SearchEngine:
 
     # -- retrieval --------------------------------------------------------
     def lexical_search(
-        self, query: str, k: int, mask: np.ndarray | None = None
+        self, query: str, k: int, mask: np.ndarray | None = None, scorer: str | None = None
     ) -> list[tuple[int, float]]:
-        return self.scorer.search(query, k, mask)
+        return (self.scorers[scorer] if scorer else self.scorer).search(query, k, mask)
 
     def dense_search(
         self, query: str, k: int, mask: np.ndarray | None = None, exact: bool = False
@@ -219,12 +221,16 @@ class SearchEngine:
         unique_docs: bool = False,
         snippets: bool = True,
         snippet_width: int = 36,
+        scorer: str | None = None,
+        exact: bool = False,
     ) -> list[SearchResult]:
         """Run a query.
 
         ``alpha`` is the weight of the *dense* retriever (``1 - alpha`` for BM25)
         in weighted fusion, and scales the dense list's contribution in RRF.
         ``depth`` is how many candidates each retriever contributes to fusion.
+        ``scorer`` overrides the configured lexical scorer (``bm25``/``bm25f``) and
+        ``exact`` bypasses the ANN index; both exist mainly for evaluation.
         """
         if mode not in MODES:
             raise ValueError(f"mode must be one of {MODES}")
@@ -235,8 +241,8 @@ class SearchEngine:
         mask = filter_mask(self.chunks, parse_filters(filters))
         n = max(depth, k * (4 if unique_docs else 1))
 
-        lex = self.lexical_search(query, n, mask) if mode in ("hybrid", "bm25") else []
-        dense = self.dense_search(query, n, mask) if mode in ("hybrid", "dense") else []
+        lex = self.lexical_search(query, n, mask, scorer) if mode in ("hybrid", "bm25") else []
+        dense = self.dense_search(query, n, mask, exact) if mode in ("hybrid", "dense") else []
 
         if mode == "bm25":
             fused = lex
