@@ -1,4 +1,4 @@
-"""Command line interface: ``hs index``, ``hs search``, ``hs stats``."""
+"""Command line interface: ``hs index | search | stats | serve``."""
 
 from __future__ import annotations
 
@@ -89,6 +89,12 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("stats", help="show index statistics")
     _add_index_dir(p)
     p.set_defaults(func=cmd_stats)
+
+    p = sub.add_parser("serve", help="serve the JSON HTTP API")
+    _add_index_dir(p)
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8765)
+    p.set_defaults(func=cmd_serve)
     return parser
 
 
@@ -207,6 +213,23 @@ def cmd_stats(args: argparse.Namespace) -> int:
     ]
     for k, v in rows:
         print(f"{st(f'{k:>13}', 'cyan')}  {v}")
+    return 0
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    from .server import make_server
+
+    engine = SearchEngine.load(args.index_dir)
+    server = make_server(engine, args.host, args.port)
+    host, port = server.server_address[:2]
+    print(f"serving {len(engine.chunks)} chunks on http://{host}:{port}  (Ctrl-C to stop)")
+    print(f'  curl "http://{host}:{port}/search?q=raft+leader+election&k=3"')
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
     return 0
 
 
