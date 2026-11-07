@@ -1,5 +1,7 @@
 # hybrid-search
 
+[![ci](https://github.com/TheWingTheWong/hybrid-search/actions/workflows/ci.yml/badge.svg)](https://github.com/TheWingTheWong/hybrid-search/actions/workflows/ci.yml)
+
 A local search engine for Markdown, plain-text and JSON Lines files. It ranks with
 BM25F over an inverted index, retrieves with dense vectors through an HNSW graph,
 and merges the two lists with reciprocal rank fusion. The ranking functions, the
