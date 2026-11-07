@@ -1,0 +1,13 @@
+On-Call Operations Handbook
+
+This handbook describes how our teams respond when production services misbehave. It is meant to be read before your first on-call shift and skimmed again whenever the rotation comes back around. The goal is not heroics; it is a calm, repeatable process that restores service quickly and teaches us something each time.
+
+Paging. Alerts page a human only when user-facing impact is happening or is imminent and a person must act. Everything else goes to a ticket queue or a dashboard. Each primary on-call engineer has a secondary who is paged automatically if the primary does not acknowledge within 5 minutes. Acknowledge every page, even if you are only starting to look; silence is what triggers escalation. If an alert fires repeatedly without requiring action, file a ticket to fix or delete it. Noisy alerts train people to ignore the important ones.
+
+Incident response. When an incident is declared, assign an incident commander who coordinates rather than debugs, a communications lead who posts status updates every 30 minutes, and responders who investigate. Open a dedicated channel and keep a running timeline of what was observed and what was changed. Mitigate first and diagnose later: rolling back a deploy, shifting traffic away from a bad region, or disabling a feature flag is almost always faster than finding the root cause under pressure.
+
+Runbooks. Every paging alert must link to a runbook. A good runbook states what the alert means, how to confirm the impact, the safe first actions, and who to escalate to. Write runbooks as commands someone half awake at 3 a.m. can copy and paste. Update the runbook during or immediately after any incident where it was wrong or missing a step.
+
+Postmortems. Any incident that consumed meaningful error budget, required paging more than one team, or affected customers gets a written postmortem within five business days. Postmortems are blameless: we describe what happened and why the system allowed it, not who made a mistake. Each one lists contributing factors, what went well, where we got lucky, and concrete action items with owners and due dates.
+
+SLOs and error budgets. Each service defines service level objectives, for example 99.9 percent of requests succeed within 300 milliseconds over a rolling 28 days. The gap between the objective and perfection is the error budget, roughly 40 minutes of total failure per month at 99.9 percent. When a service is within budget, teams ship freely. When the budget is exhausted, feature releases pause and engineering time shifts to reliability work until the burn rate recovers. Alert on fast and slow budget burn rather than on raw thresholds.
