@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# hybrid-search index directories and model caches
+.hs/
+*.hsidx/
+*.npy
+*.npz
+models/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

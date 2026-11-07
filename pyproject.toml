@@ -1,0 +1,42 @@
+[project]
+name = "hybrid-search"
+version = "0.1.0"
+description = "Local-first hybrid search: BM25/BM25F + dense vectors (exact & HNSW) fused with reciprocal rank fusion."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Ansorjon Juraev" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24"]
+keywords = ["search", "bm25", "hnsw", "vector-search", "information-retrieval", "rrf"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Text Processing :: Indexing",
+]
+
+[project.optional-dependencies]
+st = ["sentence-transformers>=2.2"]
+
+[project.scripts]
+hs = "hybrid_search.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hybrid_search"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
