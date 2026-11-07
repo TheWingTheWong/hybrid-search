@@ -27,10 +27,14 @@ def _add_index_dir(p: argparse.ArgumentParser) -> None:
 
 def _add_build_options(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("index build options")
-    g.add_argument("--backend", default="hashing",
-                   help="embedding backend: hashing (default) or st[:model-name]")
-    g.add_argument("--ann", choices=("hnsw", "exact"), default="hnsw",
-                   help="dense index type (default: hnsw)")
+    g.add_argument(
+        "--backend",
+        default="hashing",
+        help="embedding backend: hashing (default) or st[:model-name]",
+    )
+    g.add_argument(
+        "--ann", choices=("hnsw", "exact"), default="hnsw", help="dense index type (default: hnsw)"
+    )
     g.add_argument("--scorer", choices=("bm25f", "bm25"), default="bm25f")
     g.add_argument("--max-tokens", type=int, default=160, help="chunk size in tokens")
     g.add_argument("--overlap", type=int, default=32, help="token overlap between windows")
@@ -56,12 +60,22 @@ def add_search_options(p: argparse.ArgumentParser) -> None:
     p.add_argument("-k", type=int, default=5, help="number of results (default: 5)")
     p.add_argument("--mode", choices=MODES, default="hybrid")
     p.add_argument("--fusion", choices=FUSIONS, default="rrf")
-    p.add_argument("--alpha", type=float, default=0.5,
-                   help="dense weight in [0,1]; BM25 gets 1-alpha (default: 0.5)")
+    p.add_argument(
+        "--alpha",
+        type=float,
+        default=0.5,
+        help="dense weight in [0,1]; BM25 gets 1-alpha (default: 0.5)",
+    )
     p.add_argument("--rrf-k", type=int, default=60, help="RRF rank constant (default: 60)")
-    p.add_argument("--filter", "-f", action="append", default=[], metavar="EXPR",
-                   help="metadata filter, repeatable: tags=raft, year>=2022, source=*.md")
-    p.add_argument("--docs", action="store_true", help="return at most one chunk per document")  # fmt: skip
+    p.add_argument(
+        "--filter",
+        "-f",
+        action="append",
+        default=[],
+        metavar="EXPR",
+        help="metadata filter, repeatable: tags=raft, year>=2022, source=*.md",
+    )
+    p.add_argument("--docs", action="store_true", help="return at most one chunk per document")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -101,12 +115,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--queries", default="data/queries.jsonl", help="labeled queries (JSONL)")
     p.add_argument("-k", type=int, default=10, help="cutoff for MRR and nDCG (default: 10)")
     p.add_argument("--ann-recall", action="store_true", help="also measure HNSW recall vs exact")
-    p.add_argument("--synthetic", type=int, default=0, metavar="N",
-                   help="also benchmark HNSW on N synthetic vectors (e.g. 5000)")
+    p.add_argument(
+        "--synthetic",
+        type=int,
+        default=0,
+        metavar="N",
+        help="also benchmark HNSW on N synthetic vectors (e.g. 5000)",
+    )
     p.add_argument("--markdown", action="store_true", help="print GitHub-flavored tables")
     p.add_argument("--json", metavar="PATH", help="write the full report (incl. per query) here")
-    p.add_argument("--failures", action="store_true",
-                   help="list queries where the hybrid run misses at rank 1")
+    p.add_argument(
+        "--failures", action="store_true", help="list queries where the hybrid run misses at rank 1"
+    )
     _add_build_options(p)
     p.set_defaults(func=cmd_eval)
     return parser
@@ -288,7 +308,9 @@ def cmd_eval(args: argparse.Namespace) -> int:
         misses = [q for q in hybrid.per_query if q[f"MRR@{args.k}"] < 1.0]
         print()
         noun = "query" if len(misses) == 1 else "queries"
-        print(st(f"{hybrid.spec.name}: {len(misses)} {noun} without a relevant doc at rank 1", "bold"))
+        print(
+            st(f"{hybrid.spec.name}: {len(misses)} {noun} without a relevant doc at rank 1", "bold")
+        )
         for q in misses:
             print(f"  {q['id']}  {q['query']!r:60}  top3={q['top3']}")
 

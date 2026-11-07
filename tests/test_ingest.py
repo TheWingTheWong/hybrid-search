@@ -16,7 +16,9 @@ from hybrid_search.ingest import (
 
 
 def test_front_matter_types() -> None:
-    meta, body = parse_front_matter("---\ntitle: 'X'\ntags: [a, b]\nyear: 2021\nok: true\n---\nbody")
+    meta, body = parse_front_matter(
+        "---\ntitle: 'X'\ntags: [a, b]\nyear: 2021\nok: true\n---\nbody"
+    )
     assert meta == {"title": "X", "tags": ["a", "b"], "year": 2021, "ok": True}
     assert body == "body"
 
@@ -61,7 +63,9 @@ def test_chunks_carry_metadata_and_ids() -> None:
     doc = parse_markdown("---\ntags: [x]\n---\n# T\n## S\n" + "word " * 50, "d", "d.md")
     chunks = chunk_document(doc, ChunkingConfig(max_tokens=20, overlap=5))
     assert [c.chunk_id for c in chunks] == [f"d#{i}" for i in range(len(chunks))]
-    assert all(c.heading == "S" and c.metadata == {"tags": ["x"], "format": "markdown"} for c in chunks)
+    assert all(
+        c.heading == "S" and c.metadata == {"tags": ["x"], "format": "markdown"} for c in chunks
+    )
 
 
 def test_load_documents_all_formats(tiny_corpus: Path) -> None:

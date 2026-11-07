@@ -44,7 +44,7 @@ def search_params(raw: dict[str, Any]) -> dict[str, Any]:
     """Validate request parameters into keyword arguments for ``SearchEngine.search``."""
     query = raw.get("query", raw.get("q"))
     if not isinstance(query, str) or not query.strip():
-        raise ApiError("missing query: pass ?q=... or {\"query\": ...}")
+        raise ApiError('missing query: pass ?q=... or {"query": ...}')
     try:
         k = int(raw.get("k", 10))
         alpha = float(raw.get("alpha", 0.5))

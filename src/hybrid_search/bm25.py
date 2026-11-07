@@ -68,7 +68,9 @@ class InvertedIndex:
             return self
         terms = sorted(self._building)
         self.vocab = {t: i for i, t in enumerate(terms)}
-        sizes = np.fromiter((len(self._building[t]) for t in terms), dtype=np.int64, count=len(terms))
+        sizes = np.fromiter(
+            (len(self._building[t]) for t in terms), dtype=np.int64, count=len(terms)
+        )
         self.offsets = np.concatenate([[0], np.cumsum(sizes)]).astype(np.int64)
         total = int(self.offsets[-1])
         self.doc_ids = np.empty(total, dtype=np.int32)

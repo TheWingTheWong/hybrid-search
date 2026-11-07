@@ -71,7 +71,9 @@ class HashingEmbedder(EmbeddingBackend):
         self.nnz = int(nnz)
         self.seed = int(seed)
         self.idf = (
-            np.asarray(idf, dtype=np.float32) if idf is not None else np.ones(self.n_buckets, np.float32)
+            np.asarray(idf, dtype=np.float32)
+            if idf is not None
+            else np.ones(self.n_buckets, np.float32)
         )
         if self.idf.shape != (self.n_buckets,):
             raise ValueError("idf array does not match n_bits")

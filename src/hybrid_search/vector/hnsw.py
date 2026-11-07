@@ -123,11 +123,10 @@ class HNSWIndex:
         for sim, cid in candidates:
             if len(selected) >= m:
                 break
-            if selected:
-                # Reject c if some already-selected neighbor is closer to c than q is.
-                if float(np.max(self._vecs[selected] @ self._vecs[cid])) > sim:
-                    pruned.append(cid)
-                    continue
+            # Reject c if some already-selected neighbor is closer to c than q is.
+            if selected and float(np.max(self._vecs[selected] @ self._vecs[cid])) > sim:
+                pruned.append(cid)
+                continue
             selected.append(cid)
         # keepPrunedConnections: top up with the best rejected candidates.
         for cid in pruned:

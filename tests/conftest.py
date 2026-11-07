@@ -59,8 +59,18 @@ def tiny_corpus(tmp_path: Path) -> Path:
         "Pager Handbook\n\nWhen paged, acknowledge within five minutes and open an incident.\n"
     )
     records = [
-        {"id": "quorum", "title": "Quorum", "text": "A majority of replicas.", "tags": ["consensus"]},
-        {"id": "lsm", "title": "LSM tree", "text": "Memtables flush to sorted runs.", "tags": ["storage"]},
+        {
+            "id": "quorum",
+            "title": "Quorum",
+            "text": "A majority of replicas.",
+            "tags": ["consensus"],
+        },
+        {
+            "id": "lsm",
+            "title": "LSM tree",
+            "text": "Memtables flush to sorted runs.",
+            "tags": ["storage"],
+        },
     ]
     (root / "glossary.jsonl").write_text("\n".join(json.dumps(r) for r in records) + "\n")
     (root / ".hidden").mkdir()

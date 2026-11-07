@@ -48,7 +48,10 @@ def test_hnsw_recall_against_exact(data: tuple[np.ndarray, np.ndarray], hnsw: HN
     ex = ExactIndex(32)
     ex.add(pts)
     recall = np.mean(
-        [overlap_at_k([i for i, _ in hnsw.search(q, 10)], [i for i, _ in ex.search(q, 10)]) for q in qs]
+        [
+            overlap_at_k([i for i, _ in hnsw.search(q, 10)], [i for i, _ in ex.search(q, 10)])
+            for q in qs
+        ]
     )
     assert recall >= 0.95
 

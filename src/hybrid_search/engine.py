@@ -2,15 +2,13 @@
 
 Query flow::
 
-    query --+--> analyzer --> BM25/BM25F over inverted index --> top-N lexical --+
-            |                                                                    +--> RRF or
-            +--> embedder --> HNSW (or exact) over chunk vectors --> top-N dense -+    weighted blend
-                                                                                       |
-                       metadata filters --> allow-mask applied inside both retrievers  |
-                                                                                       v
-                                                             (optional) one hit per document
-                                                                                       |
-                                                                         snippet + highlights
+    query -+-> analyzer -> BM25F over inverted index ---> top-N lexical -+
+           |                                                             +-> RRF or weighted
+           +-> embedder -> HNSW (or exact) over vectors -> top-N dense ---+   blend
+                                                                         |
+           metadata filters -> allow-mask applied inside both retrievers |
+                                                                         v
+                                     optional: one hit per document -> snippets + highlights
 
 An index directory contains ``manifest.json``, ``chunks.jsonl`` and three
 ``.npz`` files (lexical postings, embedder state, vector index). Nothing is
