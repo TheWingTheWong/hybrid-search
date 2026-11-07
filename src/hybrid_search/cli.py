@@ -209,7 +209,8 @@ def print_results(
     filt = f", filters: {' AND '.join(args.filter)}" if args.filter else ""
     print(
         st(
-            f'{len(results)} results for "{query}" in {elapsed_ms:.1f} ms '
+            f'{len(results)} result{"" if len(results) == 1 else "s"} for "{query}" '
+            f"in {elapsed_ms:.1f} ms "
             f"({how}, {len(engine.chunks)} chunks{filt})",
             "dim",
         )
