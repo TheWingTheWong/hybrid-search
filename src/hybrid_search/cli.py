@@ -1,4 +1,4 @@
-"""Command line interface: ``hs index | search | stats | serve``."""
+"""Command line interface: ``hs index | search | stats | serve | eval``."""
 
 from __future__ import annotations
 
@@ -95,6 +95,20 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8765)
     p.set_defaults(func=cmd_serve)
+
+    p = sub.add_parser("eval", help="evaluate retrieval quality on a labeled query set")
+    p.add_argument("--corpus", nargs="+", default=["data/corpus"], help="paths to index")
+    p.add_argument("--queries", default="data/queries.jsonl", help="labeled queries (JSONL)")
+    p.add_argument("-k", type=int, default=10, help="cutoff for MRR and nDCG (default: 10)")
+    p.add_argument("--ann-recall", action="store_true", help="also measure HNSW recall vs exact")
+    p.add_argument("--synthetic", type=int, default=0, metavar="N",
+                   help="also benchmark HNSW on N synthetic vectors (e.g. 5000)")
+    p.add_argument("--markdown", action="store_true", help="print GitHub-flavored tables")
+    p.add_argument("--json", metavar="PATH", help="write the full report (incl. per query) here")
+    p.add_argument("--failures", action="store_true",
+                   help="list queries where the hybrid run misses at rank 1")
+    _add_build_options(p)
+    p.set_defaults(func=cmd_eval)
     return parser
 
 
@@ -231,6 +245,106 @@ def cmd_serve(args: argparse.Namespace) -> int:
     finally:
         server.server_close()
     return 0
+
+
+def cmd_eval(args: argparse.Namespace) -> int:
+    from .evaluation import ann_recall, evaluate, load_queries, synthetic_ann_benchmark
+
+    st = Style()
+    queries = load_queries(args.queries)
+    t0 = time.perf_counter()
+    engine = SearchEngine.from_paths(args.corpus, config_from_args(args))
+    s = engine.stats
+    print(st(
+        f"corpus: {s['documents']} documents, {s['chunks']} chunks, {s['terms']} terms; "
+        f"{len(queries)} labeled queries; embedder {engine.embedder.name} ({s['dim']}-d); "
+        f"built in {time.perf_counter() - t0:.2f}s", "dim",
+    ))  # fmt: skip
+    print()
+    report = evaluate(engine, queries, k=args.k)
+    if args.markdown:
+        print(report.to_markdown())
+        print()
+        print(report.by_type_markdown())
+    else:
+        cols = report.metric_names + ["p50 ms"]
+        rows = [
+            [r.spec.name] + [f"{r.metrics[m]:.3f}" for m in report.metric_names]
+            + [f"{r.latency_ms['p50']:.2f}"]
+            for r in report.runs
+        ]  # fmt: skip
+        _print_table(["run", *cols], rows, st)
+        print()
+        types = list(report.runs[0].by_type)
+        metric = f"nDCG@{args.k}"
+        _print_table(
+            [f"{metric} by type", *(f"{t} ({report.meta['type_counts'][t]})" for t in types)],
+            [[r.spec.name] + [f"{r.by_type[t][metric]:.3f}" for t in types] for r in report.runs],
+            st,
+        )
+
+    if args.failures:
+        hybrid = next(r for r in report.runs if r.spec.mode == "hybrid")
+        misses = [q for q in hybrid.per_query if q[f"MRR@{args.k}"] < 1.0]
+        print()
+        noun = "query" if len(misses) == 1 else "queries"
+        print(st(f"{hybrid.spec.name}: {len(misses)} {noun} without a relevant doc at rank 1", "bold"))
+        for q in misses:
+            print(f"  {q['id']}  {q['query']!r:60}  top3={q['top3']}")
+
+    extra: dict[str, object] = {}
+    if args.ann_recall:
+        rows = ann_recall(engine, [q.query for q in queries], k=10)
+        extra["ann_corpus"] = rows
+        print()
+        print(st(f"HNSW vs exact on corpus vectors ({len(engine.chunks)} chunks, "
+                 f"{len(queries)} queries)", "bold"))  # fmt: skip
+        _print_ann(rows, st, args.markdown)
+    if args.synthetic:
+        bench = synthetic_ann_benchmark(n=args.synthetic)
+        extra["ann_synthetic"] = bench
+        print()
+        print(st(
+            f"HNSW vs exact on {bench['n']} synthetic {bench['dim']}-d vectors "
+            f"(M={bench['M']}, ef_construction={bench['ef_construction']}, "
+            f"build {bench['build_s']:.1f}s)", "bold",
+        ))  # fmt: skip
+        _print_ann(bench["rows"], st, args.markdown)
+
+    if args.json:
+        payload = {**report.to_dict(), **extra}
+        Path(args.json).write_text(json.dumps(payload, indent=2) + "\n")
+        print(st(f"\nwrote {args.json}", "dim"))
+    return 0
+
+
+def _print_ann(rows: list[dict], st: Style, markdown: bool) -> None:
+    header = ["ef_search", "recall@10", "HNSW p50 ms", "exact p50 ms"]
+    body = [
+        [str(r["ef"]), f"{r['recall@10']:.3f}", f"{r['hnsw_ms']:.3f}", f"{r['exact_ms']:.3f}"]
+        for r in rows
+    ]
+    if markdown:
+        print("| " + " | ".join(header) + " |")
+        print("|" + "---:|" * len(header))
+        for b in body:
+            print("| " + " | ".join(b) + " |")
+    else:
+        _print_table(header, body, st)
+
+
+def _print_table(header: list[str], rows: list[list[str]], st: Style) -> None:
+    widths = [max(len(str(x)) for x in col) for col in zip(header, *rows, strict=True)]
+
+    def fmt(cells: list[str]) -> str:
+        first = f"{cells[0]:<{widths[0]}}"
+        rest = [f"{c:>{w}}" for c, w in zip(cells[1:], widths[1:], strict=True)]
+        return "  ".join([first, *rest])
+
+    print(st(fmt(header), "bold"))
+    print(st("  ".join("-" * w for w in widths), "dim"))
+    for r in rows:
+        print(fmt(r))
 
 
 def _human_size(n: float) -> str:
